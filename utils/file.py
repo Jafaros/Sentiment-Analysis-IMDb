@@ -1,3 +1,4 @@
+# Soubor pro funkce pro načítání souborů s různými kódováními
 def readFile(filePath: str) -> str:
     encodings = ('utf-8', 'cp1252', 'latin-1')
 
