@@ -50,7 +50,7 @@ Lépe vyšla metoda TF-IDF + Logistic Regression. Je vidět, že má lepší vý
 
 ### Jaké typické chyby dělá VADER vs TF-IDF?
 
-VADER často chyboval u delších recenzí, kde se míchaly pozitivní i negativní výrazy. Často se nechal zmást tím, že se v negativní recenzi objevila nějaká kladně znějící slova, a pak ji vyhodnotil špatně. Problém mu podle mě dělá i ironie nebo situace, kdy recenze nejdřív něco pochválí, ale celkově film stejně zhodnotí negativně.
+VADER často chyboval u delších recenzí, kde se míchaly pozitivní i negativní výrazy. Často se nechal zmást tím, že se v negativní recenzi objevila nějaká kladně znějící slova, a pak ji vyhodnotil špatně. Problém mu podle mě dělá i ironie, sarkasmus nebo situace, kdy recenze nejdřív něco pochválí, ale celkově film stejně zhodnotí negativně.
 
 TF-IDF si vedl lépe, ale ani on nebyl bez chyb. Nejvíc se mýlil u recenzí, které byly napsané trochu zvláštně, byly hodně popisné nebo měly jasné hodnocení až úplně na konci. Někdy ho taky zmátla slova, která sama o sobě zní pozitivně nebo negativně, ale v celém kontextu znamenají něco jiného.
 
