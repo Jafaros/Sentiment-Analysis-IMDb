@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+from shutil import copy2
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
@@ -104,6 +105,55 @@ def plot_compound_histogram(compounds, output_path: Path):
     plt.savefig(output_path, dpi=150)
     plt.close()
 
+# Funkce pro získání cest k testovacím recenzím pro výběr chybně klasifikovaných příkladů
+def get_test_review_paths(base_path: str = 'aclImdb'):
+    root = Path(base_path)
+    test_pos_paths = sorted((root / 'test' / 'pos').glob('*.txt'))
+    test_neg_paths = sorted((root / 'test' / 'neg').glob('*.txt'))
+    return test_pos_paths + test_neg_paths
+
+# Funkce pro výběr dvou chybně klasifikovaných recenzí (1 false negative a 1 false positive) pro každý model
+def select_two_misclassified_examples(test_paths, y_true, y_pred):
+    false_negative_pos = None
+    false_positive_neg = None
+
+    for path, true_label, pred_label in zip(test_paths, y_true, y_pred):
+        if true_label == 1 and pred_label == 0 and false_negative_pos is None:
+            false_negative_pos = path
+        elif true_label == 0 and pred_label == 1 and false_positive_neg is None:
+            false_positive_neg = path
+
+        if false_negative_pos is not None and false_positive_neg is not None:
+            break
+
+    if false_negative_pos is None or false_positive_neg is None:
+        raise ValueError('Nepodarilo se najit 2 priklady (pos+neg) chybne klasifikovanych recenzi.')
+
+    return {
+        'false_negative_pos': false_negative_pos,
+        'false_positive_neg': false_positive_neg,
+    }
+
+# Zkopírování dvou vybraných chybně klasifikovaných recenzí pro každý model do výstupní složky pro snadnou kontrolu a porovnání
+def copy_selected_misclassified_reviews(output_dir: Path, test_paths, test_labels, vader_predictions, tfidf_predictions):
+    selected_by_model = {
+        'vader': select_two_misclassified_examples(test_paths, test_labels, vader_predictions),
+        'tfidf': select_two_misclassified_examples(test_paths, test_labels, tfidf_predictions),
+    }
+
+    target_dir = output_dir / 'misclassified_reviews'
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    for old_file in target_dir.glob('vader_false_*.txt'):
+        old_file.unlink()
+    for old_file in target_dir.glob('tfidf_false_*.txt'):
+        old_file.unlink()
+
+    for model_name, selected_reviews in selected_by_model.items():
+        for review_type, source_path in selected_reviews.items():
+            target_name = f'{model_name}_{review_type}_{source_path.name}'
+            copy2(source_path, target_dir / target_name)
+
 # Hlavní funkce pro načítání dat, trénování modelů, vyhodnocení a ukládání výsledků
 def main():
     output_dir = Path('outputs')
@@ -116,6 +166,10 @@ def main():
     train_labels = data['train_labels']
     test_texts = data['test_texts']
     test_labels = data['test_labels']
+    test_paths = get_test_review_paths('aclImdb')
+
+    if len(test_paths) != len(test_texts):
+        raise RuntimeError('Pocet testovacich souboru neodpovida poctu testovacich textu.')
 
     print(f'Trénovací data: {len(train_texts)}')
     print(f'Testovací data: {len(test_texts)}')
@@ -138,6 +192,7 @@ def main():
     plot_confusion_matrix(vader_metrics['confusion_matrix'], 'Confusion Matrix - VADER', output_dir / 'confusion_matrix_vader.png')
     plot_confusion_matrix(tfidf_metrics['confusion_matrix'], 'Confusion Matrix - TF-IDF', output_dir / 'confusion_matrix_tfidf.png')
     plot_compound_histogram(vader_compounds, output_dir / 'vader_compound_histogram.png')
+    copy_selected_misclassified_reviews(output_dir, test_paths, test_labels, vader_predictions, tfidf_predictions)
 
     print(f'\nHotovo. Výstupy uloženy v: {output_dir.resolve()}')
 

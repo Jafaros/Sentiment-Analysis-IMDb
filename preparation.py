@@ -10,7 +10,7 @@ def load_reviews_from_folder(folder: Path, label: int):
 
 	txt_files = sorted(folder.glob('*.txt'))
 	for file_path in txt_files:
-		raw_text = readFile(file_path)
+		raw_text = readFile(str(file_path))
 		texts.append(prepare_text(raw_text))
 		labels.append(label)
 

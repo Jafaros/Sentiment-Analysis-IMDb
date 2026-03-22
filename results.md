@@ -60,11 +60,11 @@ TF-IDF si vedl lépe, ale ani on nebyl bez chyb. Nejvíc se mýlil u recenzí, k
 
 1. Pozitivní recenze chybně klasifikovaná jako negativní:
 
-Soubor `test/pos/10006_7.txt` byl ve skutečnosti pozitivní, ale VADER ho vyhodnotil jako negativní (`compound = -0.1187`). V recenzi se sice objevuje kritika jako "really cheesy sometimes", ale celkově autor film spíš doporučuje, například větou "if it's on the television, check it out".
+Soubor `test/pos/10006_7.txt` byl ve skutečnosti pozitivní, ale VADER ho vyhodnotil jako negativní. V recenzi se sice objevuje kritika jako "really cheesy sometimes", ale celkově autor film spíš doporučuje, například větou "if it's on the television, check it out".
 
 2. Negativní recenze chybně klasifikovaná jako pozitivní:
 
-Soubor `test/neg/10000_4.txt` byl ve skutečnosti negativní, ale VADER ho vyhodnotil jako pozitivní (`compound = 0.5976`). Recenze přitom jasně říká třeba "Generic and boring" nebo "second-rate action trash", jenže v textu jsou i slova, která zní pozitivně, a to VADER zřejmě zmátlo.
+Soubor `test/neg/10000_4.txt` byl ve skutečnosti negativní, ale VADER ho vyhodnotil jako pozitivní. Recenze přitom jasně říká třeba "Generic and boring" nebo "second-rate action trash", jenže v textu jsou i slova, která zní pozitivně, a to VADER zřejmě zmátlo.
 
 #### TF-IDF + Logistic Regression
 
